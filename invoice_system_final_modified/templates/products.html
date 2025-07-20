@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Products - Rajdhani Seed Company{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h2>Manage Products</h2>
+        <a href="{{ url_for('add_product_page') }}" class="add-btn">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+            </svg>
+            Add New Product
+        </a>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Packing</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.id }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.description }}</td>
+                    <td>{{ product.packing }}</td>
+                    <td>{{ product.rate }}</td>
+                    <td>{{ product.quantity }}</td>
+                    <td class="actions">
+                        <a href="{{ url_for('edit_product', id=product.id) }}" class="btn-edit">Edit</a>
+                        <form action="{{ url_for('delete_product', id=product.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center;">No products found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

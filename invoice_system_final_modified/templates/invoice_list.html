@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice List - Rajdhani Seed Company{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h2>Invoice List</h2>
+        
+        <input 
+            type="text" 
+            id="searchInput" 
+            class="search-box" 
+            placeholder="Search by mobile or name..."
+            onkeyup="filterInvoices()"
+        >
+        
+        <table id="invoiceTable">
+            <thead>
+                <tr>
+                    <th>Invoice No</th>
+                    <th>Date</th>
+                    <th>Buyer Name</th>
+                    <th>Mobile</th>
+                    <th>Total Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr>
+                    <td>{{ invoice.invoice_number }}</td>
+                    <td>{{ invoice.created_at }}</td>
+                    <td>{{ invoice.buyer_name }}</td>
+                    <td>{{ invoice.buyer_mobile }}</td>
+                    <td>{{ invoice.total_amount }}</td>
+                    <td>
+                        <a href="{{ url_for('view_invoice', invoice_number=invoice.invoice_number) }}" 
+                           class="btn-view">View</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">No invoices found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function filterInvoices() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById('invoiceTable');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                const mobile = cells[3].textContent || cells[3].innerText;
+                const name = cells[2].textContent || cells[2].innerText;
+                const invoiceNumber = cells[0].textContent || cells[0].innerText;
+                
+                if (mobile.toLowerCase().includes(filter) || 
+                    name.toLowerCase().includes(filter) ||
+                    invoiceNumber.toLowerCase().includes(filter)) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+{% endblock %}

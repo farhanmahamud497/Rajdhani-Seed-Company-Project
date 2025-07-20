@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Search Invoice - Rajdhani Seed Company{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Search Invoice</h2>
+
+    {% if error %}
+        <div class="flash danger">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('search_invoice') }}">
+        <div class="form-group">
+            <label for="invoice_number">Invoice Number:</label>
+            <input type="text" id="invoice_number" name="invoice_number" required placeholder="Enter invoice number">
+        </div>
+
+        <button type="submit" class="btn">Search Invoice</button>
+    </form>
+</div>
+{% endblock %}

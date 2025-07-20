@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}Create Invoice - Rajdhani Seed Company{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h2>Create New Invoice</h2>
+        <form method="POST" action="/generate-invoice">
+            <div class="form-group">
+                <label for="buyerName">Buyer Name:</label>
+                <input type="text" id="buyerName" name="buyerName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="buyerAddress">Buyer Address:</label>
+                <input type="text" id="buyerAddress" name="buyerAddress" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="buyerMobile">Buyer Mobile:</label>
+                <input type="text" id="buyerMobile" name="buyerMobile" required>
+                <div class="mobile-note">Note: This mobile number will be used as your invoice number</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="paymentMethod">Payment Method:</label>
+                <select id="paymentMethod" name="paymentMethod">
+                    <option value="Cash">Cash</option>
+                    <option value="Credit">Credit</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="goodsDescription">Description of Goods:</label>
+                <textarea id="goodsDescription" name="goodsDescription"></textarea>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">SL</th>
+                        <th style="width: 30%;">Product</th>
+                        <th style="width: 10%;">Quantity</th>
+                        <th style="width: 15%;">Packing Size</th>
+                        <th style="width: 15%;">Unit Price</th>
+                        <th style="width: 15%;">Amount</th>
+                        <th style="width: 10%;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsBody">
+                    <tr>
+                        <td class="sl-no">1</td>
+                        <td>
+                            <select class="product-select" name="product_id[]" required>
+                                <option value="">-- Select Product --</option>
+                                {% for product in products %}
+                                <option 
+                                    value="{{ product.id }}" 
+                                    data-packing="{{ product.packing }}"
+                                    data-rate="{{ product.rate }}">
+                                    {{ product.name }} ({{ product.quantity }} available)
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><input type="number" name="quantity[]" min="1" required style="width: 100%;"></td>
+                        <td><input type="text" name="packing[]" required style="width: 100%;" readonly></td>
+                        <td><input type="number" name="rate[]" min="0" step="0.01" required style="width: 100%;"></td>
+                        <td><input type="number" name="amount[]" readonly style="width: 100%;"></td>
+                        <td><button type="button" class="remove-item-btn">X</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <button type="button" class="add-btn" id="addItemBtn">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+                Add Item
+            </button>
+
+            <div class="total-section">
+                <div class="total-row">
+                    <div class="total-label">Total Amount:</div>
+                    <div class="total-value">
+                        <input type="text" id="totalAmount" name="totalAmount" readonly style="width: 200px; padding: 10px;">
+                    </div>
+                </div>
+                <div class="total-row">
+                    <div class="total-label">Amount in Words:</div>
+                    <div class="total-value">
+                        <input type="text" id="amountInWords" name="amountInWords" readonly style="width: 100%; padding: 10px;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" name="action" value="preview" class="btn btn-preview">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                    </svg>
+                    Preview Invoice
+                </button>
+                <button type="submit" name="action" value="download" class="btn btn-download">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                        <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                    </svg>
+                    Download PDF
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Add item function
+        document.getElementById('addItemBtn').addEventListener('click', function() {
+            const tbody = document.getElementById('itemsBody');
+            const newRow = tbody.insertRow();
+            const newIndex = tbody.rows.length;
+            
+            newRow.innerHTML = `
+                <td class="sl-no">${newIndex}</td>
+                <td>
+                    <select class="product-select" name="product_id[]" required>
+                        <option value="">-- Select Product --</option>
+                        {% for product in products %}
+                        <option 
+                            value="{{ product.id }}" 
+                            data-packing="{{ product.packing }}"
+                            data-rate="{{ product.rate }}">
+                            {{ product.name }} ({{ product.quantity }} available)
+                        </option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td><input type="number" name="quantity[]" min="1" required style="width: 100%;"></td>
+                <td><input type="text" name="packing[]" required style="width: 100%;" readonly></td>
+                <td><input type="number" name="rate[]" min="0" step="0.01" required style="width: 100%;"></td>
+                <td><input type="number" name="amount[]" readonly style="width: 100%;"></td>
+                <td><button type="button" class="remove-item-btn">X</button></td>
+            `;
+            
+            // Add event handlers to new elements
+            const select = newRow.querySelector('.product-select');
+            select.addEventListener('change', function() {
+                fillProductDetails(this);
+            });
+            
+            const qtyInput = newRow.querySelector('input[name="quantity[]"]');
+            const rateInput = newRow.querySelector('input[name="rate[]"]');
+            
+            qtyInput.addEventListener('change', function() {
+                calculateRow(this);
+            });
+            
+            rateInput.addEventListener('change', function() {
+                calculateRow(this);
+            });
+            
+            newRow.querySelector('.remove-item-btn').addEventListener('click', function() {
+                removeItem(this);
+            });
+            
+            // Update serial numbers
+            updateSerialNumbers();
+        });
+
+        // Remove item function
+        function removeItem(btn) {
+            const row = btn.closest('tr');
+            const tbody = document.getElementById('itemsBody');
+            
+            if (tbody.rows.length > 1) {
+                row.remove();
+                updateSerialNumbers();
+                calculateTotals();
+            } else {
+                alert("At least one item is required.");
+            }
+        }
+
+        // Update serial numbers
+        function updateSerialNumbers() {
+            const rows = document.querySelectorAll('#itemsBody tr');
+            rows.forEach((row, index) => {
+                row.querySelector('.sl-no').textContent = index + 1;
+            });
+        }
+
+        // Fill product details
+        function fillProductDetails(select) {
+            const row = select.closest('tr');
+            const option = select.options[select.selectedIndex];
+            
+            if (option.value) {
+                row.querySelector('input[name="packing[]"]').value = option.dataset.packing || '';
+                row.querySelector('input[name="rate[]"]').value = option.dataset.rate || '';
+                calculateRow(row);
+            } else {
+                row.querySelector('input[name="packing[]"]').value = '';
+                row.querySelector('input[name="rate[]"]').value = '';
+                row.querySelector('input[name="amount[]"]').value = '';
+            }
+        }
+
+        // Calculate row total
+        function calculateRow(rowInput) {
+            let row;
+            if (rowInput instanceof HTMLInputElement || rowInput instanceof HTMLSelectElement) {
+                row = rowInput.closest('tr');
+            } else {
+                row = rowInput;
+            }
+            
+            const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+            const rate = parseFloat(row.querySelector('input[name="rate[]"]').value) || 0;
+            const amountInput = row.querySelector('input[name="amount[]"]');
+            
+            const amount = quantity * rate;
+            amountInput.value = amount.toFixed(2);
+            
+            calculateTotals();
+        }
+
+        // Calculate grand total
+        function calculateTotals() {
+            let total = 0;
+            const rows = document.querySelectorAll('#itemsBody tr');
+            
+            rows.forEach(row => {
+                const amountInput = row.querySelector('input[name="amount[]"]');
+                const amount = parseFloat(amountInput.value) || 0;
+                total += amount;
+            });
+
+            document.getElementById('totalAmount').value = total.toFixed(2);
+            document.getElementById('amountInWords').value = numberToWords(total);
+        }
+
+        // Number to words conversion
+        function numberToWords(num) {
+            const units = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
+            const teens = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+            const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+            
+            num = Math.round(num);
+            if (num === 0) return "Zero Taka Only";
+            if (num < 0) return "Minus " + numberToWords(Math.abs(num));
+            
+            let words = "";
+            
+            if (Math.floor(num / 10000000) > 0) {
+                words += numberToWords(Math.floor(num / 10000000)) + " Crore ";
+                num %= 10000000;
+            }
+            
+            if (Math.floor(num / 100000) > 0) {
+                words += numberToWords(Math.floor(num / 100000)) + " Lakh ";
+                num %= 100000;
+            }
+            
+            if (Math.floor(num / 1000) > 0) {
+                words += numberToWords(Math.floor(num / 1000)) + " Thousand ";
+                num %= 1000;
+            }
+            
+            if (Math.floor(num / 100) > 0) {
+                words += numberToWords(Math.floor(num / 100)) + " Hundred ";
+                num %= 100;
+            }
+            
+            if (num > 0) {
+                if (words !== "") words += "and ";
+                
+                if (num < 10) {
+                    words += units[num];
+                } else if (num < 20) {
+                    words += teens[num - 10];
+                } else {
+                    words += tens[Math.floor(num / 10)];
+                    if (num % 10 > 0) {
+                        words += "-" + units[num % 10];
+                    }
+                }
+            }
+            
+            return words + " Taka Only";
+        }
+
+        // Initialize event handlers for the first row
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event handlers to existing elements in the first row
+            document.querySelectorAll('.product-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    fillProductDetails(this);
+                });
+            });
+            
+            document.querySelectorAll('input[name="quantity[]"], input[name="rate[]"]').forEach(input => {
+                input.addEventListener('change', function() {
+                    calculateRow(this);
+                });
+            });
+            
+            document.querySelectorAll('.remove-item-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    removeItem(this);
+                });
+            });
+            
+            // Initialize calculations
+            calculateTotals();
+        });
+    </script>
+{% endblock %}

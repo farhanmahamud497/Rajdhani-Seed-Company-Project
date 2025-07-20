@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Add Product - Rajdhani Seeds{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h2>Add New Product</h2>
+        
+        <form method="POST" action="{{ url_for('manage_products') }}">
+            <div class="form-group">
+                <label for="name">Product Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="packing">Packing Size:</label>
+                <input type="text" id="packing" name="packing" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="rate">Unit Price (৳):</label>
+                <input type="number" id="rate" name="rate" step="0.01" min="0" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="quantity">Initial Quantity:</label>
+                <input type="number" id="quantity" name="quantity" min="0" required>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-download">Save Product</button>
+                <a href="{{ url_for('manage_products') }}" class="btn btn-preview">Cancel</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

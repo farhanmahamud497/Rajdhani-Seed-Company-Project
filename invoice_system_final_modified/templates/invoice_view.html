@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Invoice {{ invoice.invoice_data.invoice_number }} - Rajdhani Seed Company{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="invoice-header">
+        <h2>Invoice Details</h2>
+        <div class="invoice-actions">
+            <a href="{{ url_for('view_invoice', invoice_number=invoice.invoice_data.invoice_number) }}?pdf=true" class="btn btn-pdf">Download PDF</a>
+            <a href="{{ url_for('invoice_search') }}" class="btn btn-back">Back to Search</a>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Invoice Information</h3>
+        <p><strong>Invoice Number:</strong> {{ invoice.invoice_data.invoice_number }}</p>
+        <p><strong>Date:</strong> {{ invoice.invoice_data.invoice_date }}</p>
+        <p><strong>Total Amount:</strong> ৳ {{ "%.2f"|format(invoice.invoice_data.total_amount) }}</p>
+    </div>
+
+    <div class="section">
+        <h3>Buyer Information</h3>
+        <p><strong>Name:</strong> {{ invoice.invoice_data.buyer_name }}</p>
+        <p><strong>Address:</strong> {{ invoice.invoice_data.buyer_address }}</p>
+        <p><strong>Mobile:</strong> {{ invoice.invoice_data.buyer_mobile }}</p>
+        <p><strong>Payment Method:</strong> {{ invoice.invoice_data.payment_method }}</p>
+        {% if invoice.invoice_data.goods_description %}
+        <p><strong>Goods Description:</strong> {{ invoice.invoice_data.goods_description }}</p>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h3>Items</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>SL</th>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th>Packing</th>
+                    <th>Unit Price</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in invoice.items %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ item.description }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.packing }}</td>
+                    <td>৳ {{ "%.2f"|format(item.rate) }}</td>
+                    <td>৳ {{ "%.2f"|format(item.amount) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="totals">
+            <p><strong>Total Amount:</strong> ৳ {{ "%.2f"|format(invoice.invoice_data.total_amount) }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

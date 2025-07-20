@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Recent Invoices - Rajdhani Seed Company{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Recent Invoices</h2>
+
+    {% if invoices|length == 0 %}
+        <p>No invoices found</p>
+    {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Invoice Number</th>
+                    <th>Date</th>
+                    <th>Buyer Name</th>
+                    <th>Mobile</th>
+                    <th>Total Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr>
+                    <td>{{ invoice.invoice_number }}</td>
+                    <td>{{ invoice.created_at }}</td>
+                    <td>{{ invoice.buyer_name }}</td>
+                    <td>{{ invoice.buyer_mobile }}</td>
+                    <td>৳ {{ "%.2f"|format(invoice.total_amount) }}</td>
+                    <td>
+                        <a href="{{ url_for('view_invoice', invoice_number=invoice.invoice_number) }}" class="invoice-link">View</a> | 
+                        <a href="{{ url_for('view_invoice', invoice_number=invoice.invoice_number) }}?pdf=true" class="invoice-link">PDF</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}

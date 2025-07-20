@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice {{ invoice_number }} - {{ company.name }}</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 25px; 
+            color: #000; 
+            font-size: 14px; 
+            line-height: 1.5;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            border: 1px solid #000;
+            padding: 25px;
+        }
+        .header { 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            padding-bottom: 20px; 
+            border-bottom: 2px solid #000;
+        }
+        .logo-container { 
+            width: 150px; 
+            margin-right: 25px;
+        }
+        .logo-img { 
+            max-width: 100%; 
+            height: auto;
+            max-height: 100px;
+        }
+        .logo-placeholder {
+            height: 100px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #000;
+        }
+        .company-info { 
+            flex-grow: 1; 
+        }
+        .company-name { 
+            font-size: 24px; 
+            font-weight: bold; 
+            margin-bottom: 8px; 
+        }
+        .invoice-title { 
+            font-size: 24px; 
+            font-weight: bold; 
+            margin: 30px 0; 
+            text-align: center; 
+            text-transform: uppercase;
+        }
+        .buyer-info { 
+            margin-bottom: 25px; 
+            padding: 20px; 
+            border: 1px solid #000;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .info-table td {
+            padding: 8px 0;
+            border: none;
+        }
+        .info-table td:first-child {
+            width: 25%;
+            font-weight: bold;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 25px 0; 
+            border: 1px solid #000;
+        }
+        th { 
+            background-color: #f0f0f0; 
+            padding: 12px 10px; 
+            text-align: left; 
+            font-weight: bold;
+            border: 1px solid #000;
+        }
+        td { 
+            padding: 10px; 
+            border: 1px solid #000; 
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .totals { 
+            margin-top: 30px; 
+        }
+        .total-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+        .total-label {
+            width: 200px;
+            font-weight: bold;
+            text-align: right;
+            padding-right: 15px;
+        }
+        .total-value {
+            width: 200px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .amount-in-words {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #000;
+        }
+        .signature { 
+            margin-top: 60px; 
+            text-align: right; 
+        }
+        .footer { 
+            margin-top: 50px; 
+            padding-top: 20px; 
+            border-top: 1px solid #000; 
+            text-align: center; 
+            font-size: 13px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <!-- Logo handling for both web and PDF -->
+                {% if is_pdf and company.logo_pdf %}
+                    <img src="{{ company.logo_pdf }}" alt="Company Logo" class="logo-img">
+                {% elif not is_pdf and company.logo_web %}
+                    <img src="{{ company.logo_web }}" alt="Company Logo" class="logo-img">
+                {% else %}
+                    <div class="logo-placeholder">
+                        <span>Company Logo</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="company-info">
+                <div class="company-name">{{ company.name }}</div>
+                <div>{{ company.address }}</div>
+                <div>{{ company.contacts|join(' | ') }}</div>
+                <div>Email: {{ company.email }}</div>
+            </div>
+        </div>
+
+        <div class="invoice-title">Tax Invoice</div>
+
+        <div class="buyer-info">
+            <table class="info-table">
+                <tr>
+                    <td>Invoice No:</td>
+                    <td>{{ invoice_number }}</td>
+                </tr>
+                <tr>
+                    <td>Date:</td>
+                    <td>{{ invoice_date }}</td>
+                </tr>
+                <tr>
+                    <td>Buyer Name:</td>
+                    <td>{{ buyer_info.name }}</td>
+                </tr>
+                <tr>
+                    <td>Buyer Address:</td>
+                    <td>{{ buyer_info.address }}</td>
+                </tr>
+                <tr>
+                    <td>Buyer Mobile:</td>
+                    <td>{{ buyer_info.mobile }}</td>
+                </tr>
+                <tr>
+                    <td>Payment Method:</td>
+                    <td>{{ buyer_info.payment_method }}</td>
+                </tr>
+            </table>
+        </div>
+
+        {% if goods_description %}
+        <div style="margin-bottom: 25px;">
+            <strong>Description of Goods:</strong><br>
+            {{ goods_description }}
+        </div>
+        {% endif %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%;">SL</th>
+                    <th style="width: 45%;">Product Name</th>
+                    <th style="width: 10%;">Quantity</th>
+                    <th style="width: 15%;">Packing Size</th>
+                    <th style="width: 15%;">Unit Price (৳)</th>
+                    <th style="width: 15%;">Amount (৳)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td class="text-center">{{ loop.index }}</td>
+                    <td>{{ item.product_name }}</td>
+                    <td class="text-center">{{ item.quantity }}</td>
+                    <td>{{ item.packing }}</td>
+                    <td class="text-right">{{ "%.2f"|format(item.rate) }}</td>
+                    <td class="text-right">{{ "%.2f"|format(item.amount) }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="5" class="text-right"><strong>Total Amount:</strong></td>
+                    <td class="text-right"><strong>{{ "%.2f"|format(total_amount) }} ৳</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="totals">
+            <div class="amount-in-words">
+                <strong>Amount in Words:</strong> {{ amount_in_words }}
+            </div>
+        </div>
+
+        <div class="signature">
+            <p>For {{ company.name }}</p>
+            <br><br><br>
+            <p>_________________________</p>
+            <p>Authorized Signature</p>
+        </div>
+
+        <div class="footer">
+            <p>Thank you for your business!</p>
+            <p>This is a computer generated invoice. No signature required.</p>
+            <p>If you have any questions about this invoice, please contact our customer service.</p>
+        </div>
+    </div>
+</body>
+</html>

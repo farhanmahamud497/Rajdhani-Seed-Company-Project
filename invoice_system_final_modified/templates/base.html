@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}Rajdhani Seed Company{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+    <div class="nav-container">
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}">Create Invoice</a>
+            <a href="{{ url_for('manage_products') }}">Manage Products</a>
+            <a href="{{ url_for('invoice_list') }}">View Invoices</a>
+            <a href="{{ url_for('invoice_search') }}">Search Invoices</a>
+            <a href="{{ url_for('recent_invoices') }}">Recent Invoices</a>
+            <a href="{{ url_for('inventory_report') }}">Inventory Report</a>
+        </div>
+        <div class="auth-links">
+            {% if current_user.is_authenticated %}
+                <span>Welcome, {{ current_user.username }}</span>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>
